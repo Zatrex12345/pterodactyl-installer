@@ -103,9 +103,9 @@ install_composer() {
 }
 
 ptdl_dl() {
-  output "Downloading pterodactyl panel files .. "
-  mkdir -p /var/www/pterodactyl
-  cd /var/www/pterodactyl || exit
+  output "Downloading jexactyl panel files .. "
+  mkdir -p /var/www/jexactyl
+  cd /var/www/jexactyl || exit
 
   curl -Lo panel.tar.gz "$PANEL_DL_URL"
   tar -xzvf panel.tar.gz
@@ -113,7 +113,7 @@ ptdl_dl() {
 
   cp .env.example .env
 
-  success "Downloaded pterodactyl panel files!"
+  success "Downloaded jexactyl panel files!"
 }
 
 install_composer_deps() {
@@ -188,7 +188,7 @@ insert_cronjob() {
 
   crontab -l | {
     cat
-    output "* * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1"
+    output "* * * * php /var/www/jexactyl/artisan schedule:run >> /dev/null 2>&1"
   } | crontab -
 
   success "Cronjob installed!"
@@ -239,7 +239,7 @@ selinux_allow() {
 }
 
 php_fpm_conf() {
-  curl -o /etc/php-fpm.d/www-pterodactyl.conf "$GITHUB_URL"/configs/www-pterodactyl.conf
+  curl -o /etc/php-fpm.d/www-jexactyl.conf "$GITHUB_URL"/configs/www-jexactyl.conf
 
   systemctl enable php-fpm
   systemctl start php-fpm
@@ -382,7 +382,7 @@ configure_nginx() {
     CONFIG_PATH_ENABL="/etc/nginx/sites-enabled"
     ;;
   rocky | almalinux)
-    PHP_SOCKET="/var/run/php-fpm/pterodactyl.sock"
+    PHP_SOCKET="/var/run/php-fpm/jexactyl.sock"
     CONFIG_PATH_AVAIL="/etc/nginx/conf.d"
     CONFIG_PATH_ENABL="$CONFIG_PATH_AVAIL"
     ;;
@@ -390,15 +390,15 @@ configure_nginx() {
 
   rm -rf "$CONFIG_PATH_ENABL"/default
 
-  curl -o "$CONFIG_PATH_AVAIL"/pterodactyl.conf "$GITHUB_URL"/configs/$DL_FILE
+  curl -o "$CONFIG_PATH_AVAIL"/jexactyl.conf "$GITHUB_URL"/configs/$DL_FILE
 
-  sed -i -e "s@<domain>@${FQDN}@g" "$CONFIG_PATH_AVAIL"/pterodactyl.conf
+  sed -i -e "s@<domain>@${FQDN}@g" "$CONFIG_PATH_AVAIL"/jexactyl.conf
 
-  sed -i -e "s@<php_socket>@${PHP_SOCKET}@g" "$CONFIG_PATH_AVAIL"/pterodactyl.conf
+  sed -i -e "s@<php_socket>@${PHP_SOCKET}@g" "$CONFIG_PATH_AVAIL"/jexactyl.conf
 
   case "$OS" in
   ubuntu | debian)
-    ln -sf "$CONFIG_PATH_AVAIL"/pterodactyl.conf "$CONFIG_PATH_ENABL"/pterodactyl.conf
+    ln -sf "$CONFIG_PATH_AVAIL"/jexactyl.conf "$CONFIG_PATH_ENABL"/jexactyl.conf
     ;;
   esac
 
